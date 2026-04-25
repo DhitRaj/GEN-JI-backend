@@ -1,4 +1,9 @@
 require('dotenv').config();
+const dns = require('dns');
+
+// Fix DNS resolution issues (use Cloudflare DNS)
+dns.setServers(['1.1.1.1', '1.0.0.1']);
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -31,10 +36,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI || process.env.MONGODB_LOCAL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI || process.env.MONGODB_LOCAL)
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
