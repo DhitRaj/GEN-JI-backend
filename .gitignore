@@ -3,6 +3,9 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Keep package-lock.json (needed for production builds)
+!package-lock.json
+
 # Environment variables
 .env
 .env.local
