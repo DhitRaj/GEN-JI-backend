@@ -20,8 +20,14 @@ const app = express();
 
 // Middleware
 app.use(helmet());
+const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3001')
+  .split(',').map(o => o.trim());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -35,9 +41,28 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Database Connection
+// Database Connection + Auto seed admin
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGODB_LOCAL)
-  .then(() => console.log('✅ MongoDB connected'))
+  .then(async () => {
+    console.log('✅ MongoDB connected');
+    // Auto-create admin if not exists
+    try {
+      const Admin = require('./models/Admin');
+      const adminExists = await Admin.findOne({ email: process.env.ADMIN_EMAIL });
+      if (!adminExists && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+        await Admin.create({
+          email: process.env.ADMIN_EMAIL,
+          password: process.env.ADMIN_PASSWORD,
+          role: 'superadmin',
+        });
+        console.log('✅ Default admin created:', process.env.ADMIN_EMAIL);
+      } else {
+        console.log('ℹ️ Admin already exists');
+      }
+    } catch (err) {
+      console.error('❌ Admin seed error:', err.message);
+    }
+  })
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
