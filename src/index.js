@@ -22,6 +22,13 @@ const app = express();
 app.use(helmet());
 const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3001')
   .split(',').map(o => o.trim());
+
+// Add localhost:3000 for development
+if (process.env.NODE_ENV !== 'production') {
+  allowedOrigins.push('http://localhost:3000');
+  allowedOrigins.push('http://localhost:3001');
+}
+
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (mobile apps, curl, etc.)
