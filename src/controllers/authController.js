@@ -11,7 +11,7 @@ const generateToken = (id) => {
 // Register (Admin only - manual setup)
 exports.register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Check if admin exists
     let admin = await Admin.findOne({ email });
@@ -20,10 +20,11 @@ exports.register = async (req, res) => {
     }
 
     // Create admin
+    const newRole = role === 'superadmin' ? 'superadmin' : 'admin';
     admin = await Admin.create({
       email,
       password,
-      role: 'admin',
+      role: newRole,
     });
 
     const token = generateToken(admin._id);
