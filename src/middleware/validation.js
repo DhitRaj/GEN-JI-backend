@@ -28,7 +28,10 @@ const validateService = (data) => {
   const schema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
-    icon: Joi.string().optional(),
+    icon: Joi.string().optional().allow(''),
+    image: Joi.string().optional().allow(''),
+    features: Joi.array().items(Joi.string()).optional(),
+    price: Joi.string().optional().allow(''),
     order: Joi.number().optional(),
   });
 

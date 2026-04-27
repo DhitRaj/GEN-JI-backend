@@ -7,6 +7,7 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "seed": "node seed.js",
+    "seed-data": "node seedData.js",
     "build": "tsc"
   },
   "keywords": [
